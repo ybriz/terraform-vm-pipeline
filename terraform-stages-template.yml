@@ -17,10 +17,10 @@ stages:
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
     steps:
 
-    - template: ../infrastructure/terraform-init-template.yml
+    - template: infrastructure/terraform-init-template.yml
       parameters:
         provisionStorage: true
-        TerraformDirectory: 101-terraform-job/terraform
+        TerraformDirectory: terraform
         environment: ${{ parameters.environment }}
 
     # Using bash instead of Terraform extension because of following issues:
@@ -32,7 +32,7 @@ stages:
         export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
         terraform apply -input=false -auto-approve -var environment=${{ parameters.environment }} ${{ parameters.TerraformArguments }}
       displayName: Terraform apply
-      workingDirectory: 101-terraform-job/terraform
+      workingDirectory: terraform
       env:
         ${{ parameters.TerraformEnvVariables }}
 
@@ -45,14 +45,14 @@ stages:
     displayName: Use Terraform outputs
     steps:
 
-    - template: ../infrastructure/terraform-init-template.yml
+    - template: infrastructure/terraform-init-template.yml
       parameters:
-        TerraformDirectory: 101-terraform-job/terraform
+        TerraformDirectory: terraform
         environment: ${{ parameters.environment }}
 
-    - template: ../infrastructure/terraform-outputs-template.yml
+    - template: infrastructure/terraform-outputs-template.yml
       parameters:
-        TerraformDirectory: 101-terraform-job/terraform
+        TerraformDirectory: terraform
 
     - bash: |
         # Dummy job showing how to consume Terraform outputs
